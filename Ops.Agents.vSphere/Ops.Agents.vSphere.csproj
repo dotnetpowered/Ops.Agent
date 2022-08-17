@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ops.Shared\Ops.Shared.csproj" />
+    <ProjectReference Include="..\Ops.Agents.Shared\Ops.Agents.Shared.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="vmware_serverlist.ps1" />
+    <None Remove="Microsoft.PowerShell.SDK" />
+    <None Remove="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="vmware_serverlist.ps1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.2.6" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+  </ItemGroup>
+</Project>
