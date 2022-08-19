@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\GitHub\dotnetpowered\Rundeck.Api\Rundeck.Api\Rundeck.Api.csproj" />
     <ProjectReference Include="..\Ops.Agents.Shared\Ops.Agents.Shared.csproj" />
+    <ProjectReference Include="..\..\Rundeck.Api\Rundeck.Api\Rundeck.Api.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=3.1.26.0, Culture=neutral, PublicKeyToken=adb9793829ddae60" />
