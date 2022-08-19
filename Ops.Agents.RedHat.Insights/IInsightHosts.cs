@@ -1,5 +1,6 @@
 ﻿using System;
 using Refit;
+using Ops.Agents.RedHat.Insights.Models;
 
 namespace Ops.Agents.RedHat.Insights;
 

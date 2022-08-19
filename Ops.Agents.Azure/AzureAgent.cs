@@ -5,6 +5,7 @@ using Azure.Monitor.Query;
 using Azure.Monitor.Query.Models;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Logging;
+using Ops.Agents.Shared.Models;
 
 namespace Ops.Agents.Azure;
 

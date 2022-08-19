@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using ZabbixApi;
 using ZabbixApi.Entities;
 using ZabbixApi.Services;
+using Ops.Agents.Shared.Models;
 
 namespace Ops.Agents.Zabbix;
 

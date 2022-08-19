@@ -2,6 +2,7 @@
 using Rundeck.Api;
 using Rundeck.Api.Models;
 using Rundeck.Api.Models.Dtos;
+using Ops.Agents.Shared.Models;
 
 namespace Ops.Agents.Rundeck;
 

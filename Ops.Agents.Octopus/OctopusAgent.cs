@@ -2,6 +2,7 @@
 using Octopus.Client;
 using Octopus.Client.Model;
 using OctopusMachineResource = Octopus.Client.Model.MachineResource;
+using Ops.Agents.Shared.Models;
 
 namespace Ops.Agents.Octopus;
 

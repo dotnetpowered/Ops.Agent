@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
+using Ops.Agents.Shared.Models;
 
 namespace Ops.Agents.vSphere;
 

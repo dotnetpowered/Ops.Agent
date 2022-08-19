@@ -12,9 +12,13 @@
   <ItemGroup>
     <None Remove="Refit" />
     <None Remove="Microsoft.Extensions.Logging" />
+    <None Remove="Models\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Refit" Version="6.3.2" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\" />
   </ItemGroup>
 </Project>

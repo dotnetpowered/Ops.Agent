@@ -2,6 +2,7 @@
 using System.Security.AccessControl;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
+using Ops.Agents.Shared.Models;
 
 namespace Ops.Agents.Amq;
 
