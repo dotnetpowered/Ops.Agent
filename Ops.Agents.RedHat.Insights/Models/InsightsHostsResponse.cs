@@ -4,6 +4,7 @@ using System.Xml.Linq;
 
 namespace Ops.Agents.RedHat.Insights.Models;
 
+[DataContract]
 public class InsightsHostsResponse
 {
     [DataMember(Name = "total")]

@@ -12,7 +12,7 @@ public interface IInsightHosts
     /// Gets a list of hosts
     /// </summary>
     /// <param name="cancellationToken"></param>
-    [Get("/")]
+    [Get("/hosts")]
     Task<InsightsHostsResponse> GetAsync(
         CancellationToken cancellationToken = default);
 
@@ -22,7 +22,7 @@ public interface IInsightHosts
     /// Gets the host detail
     /// </summary>
     /// <param name="cancellationToken"></param>
-    [Get("/{id}/system_profile")]
+    [Get("/hosts/{id}/system_profile")]
     Task<InsightsHostResponse> GetHostAsync(
         string id,
         CancellationToken cancellationToken = default);

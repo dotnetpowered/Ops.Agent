@@ -11,9 +11,13 @@ IHost host = Host.CreateDefaultBuilder(args)
                 .AddTransient<Ops.Agents.vSphere.vSphereAgent>()
                 .AddTransient<Ops.Agents.Octopus.OctopusAgent>()
                 .AddTransient<Ops.Agents.Azure.AzureAgent>()
-                .AddTransient<Ops.Agents.Amq.AmqAgent>();
+                .AddTransient<Ops.Agents.Amq.AmqAgent>()
+                .AddTransient<Ops.Agents.RedHat.Insights.InsightsAgent>();
+
+        services.AddLogging(lf => lf.AddConsole());
 
         services.AddHostedService<Worker>();
+
         services
             .AddRefitClient<IOpsIngestApi>()
             .ConfigureHttpClient(c => c.BaseAddress = new Uri(url));

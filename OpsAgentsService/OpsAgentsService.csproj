@@ -11,6 +11,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
     <PackageReference Include="Refit" Version="6.3.2" />
     <PackageReference Include="Refit.HttpClientFactory" Version="6.3.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ops.Agents.Zabbix\Ops.Agents.Zabbix.csproj" />
@@ -24,5 +25,6 @@
   <ItemGroup>
     <None Remove="Refit" />
     <None Remove="Refit.HttpClientFactory" />
+    <None Remove="Microsoft.Extensions.Logging.Console" />
   </ItemGroup>
 </Project>

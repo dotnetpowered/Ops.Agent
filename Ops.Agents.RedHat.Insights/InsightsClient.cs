@@ -14,14 +14,14 @@ public class InsightsClient
     private readonly HttpClient _httpClient;
 
 
-    public InsightsClient(ILogger logger, string username, string password)
+    public InsightsClient(ILogger<InsightsClient> logger, string username, string password)
     {
         _logger = logger;
         var authenticationString = $"{username}:{password}";
         var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
 
         _httpClient = new HttpClient() {
-            BaseAddress = new Uri("https://console.redhat.com/api/inventory/v1/hosts")
+            BaseAddress = new Uri("https://console.redhat.com/api/inventory/v1")
         };
         var refitSettings = new RefitSettings
         {

@@ -4,10 +4,11 @@ using System.Xml.Linq;
 
 namespace Ops.Agents.RedHat.Insights.Models;
 
+[DataContract]
 public class InsightsSystemProfile
 {
     [DataMember(Name = "os_release")]
-    public string? OsReleases { get; set; }
+    public string? OsRelease { get; set; }
     [DataMember(Name = "infrastructure_type")]
     public string? InfrastructureType { get; set; }
     [DataMember(Name = "infrastructure_vendor")]
@@ -23,5 +24,5 @@ public class InsightsSystemProfile
     [DataMember(Name = "os_kernel_version")]
     public string? OsKernelVersion { get; set; }
     [DataMember(Name = "system_memory_bytes")]
-    public int? SystemMemoryBytes { get; set; }
+    public long? SystemMemoryBytes { get; set; }
 }
