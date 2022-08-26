@@ -3,11 +3,30 @@ using Azure;
 using Azure.Identity;
 using Azure.Monitor.Query;
 using Azure.Monitor.Query.Models;
-using Newtonsoft.Json;
 using Microsoft.Extensions.Logging;
 using Ops.Agents.Shared.Models;
 
 namespace Ops.Agents.Azure;
+
+// -----------------------------------------------------------------------------
+// Azure Setup
+// -----------------------------------------------------------------------------
+// az ad sp create-for-rbac --name OpsAgent
+//
+// results:
+// {
+//   "appId": "<<app Id>>",
+//   "displayName": "OpsAgent",
+//   "password": "<< secret >>",
+//   "tenant": "<< tenant >>"
+// }
+//
+// az role assignment create --assignee "<<app Id>>" --role "Log Analytics Contributor" --resource-group "<<resource group>>"
+
+// -----------------------------------------------------------------------------
+// Azure Query Documentation
+// -----------------------------------------------------------------------------
+// https://docs.microsoft.com/en-us/azure/automation/update-management/query-logs
 
 public class AzureAgent : IOpsAgent
 {
@@ -24,16 +43,17 @@ public class AzureAgent : IOpsAgent
 
     public async Task CollectAsync(AgentConfig agentConfig)
     {
-        //https://docs.microsoft.com/en-us/azure/automation/update-management/query-logs
-        var assembly = Assembly.GetExecutingAssembly();
-        var stream = assembly.GetManifestResourceStream("Computer_List.txt");
+        // To get a list of resource names:
+        // var names = this.GetType().GetTypeInfo().Assembly.GetManifestResourceNames();
+        var stream = this.GetType().GetTypeInfo().Assembly.GetManifestResourceStream("Ops.Agents.Azure.Computer_List.txt");
         if (stream == null)
             throw new InvalidOperationException("Unable to load Computer_List.txt resource.");
         var streamreader = new StreamReader(stream);
         var query = streamreader.ReadToEnd();
-        var client = new LogsQueryClient(new DefaultAzureCredential(true));
-        var response = await client.QueryWorkspaceAsync(
-            agentConfig.WorkspaceId, query,
+        DefaultAzureCredentialOptions op = new DefaultAzureCredentialOptions();
+        var creds = new ClientSecretCredential(agentConfig.Tenant, agentConfig.Username, agentConfig.Password);
+        var client = new LogsQueryClient(creds); // new DefaultAzureCredential(true));
+        var response = await client.QueryWorkspaceAsync(agentConfig.Workspace, query,
             new QueryTimeRange(TimeSpan.FromDays(1)));
 
         LogsTable table = response.Value.Table;
@@ -54,5 +74,4 @@ public class AzureAgent : IOpsAgent
         }
         //await dbClient.UpsertItemsAsync("Metrics", "Items", items);
     }
-
 }
