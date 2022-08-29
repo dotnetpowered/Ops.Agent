@@ -20,6 +20,8 @@ public abstract class Asset
     public DateTime? AsOf { get; set; }
     public string AssetType { get; set; } // Machine, Cabinet, Switch, etc.
     public string? Location { get; set; } // Physical Location (City, State)
+    public string? Permalink { get; set; }
+    public string? AgentVersion { get; set; }
 
     public override string ToString()
     {
