@@ -11,7 +11,7 @@
     <None Remove="Microsoft.Extensions.Logging.Abstractions" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Octopus.Client" Version="13.1.111" />
+    <PackageReference Include="Octopus.Client" Version="13.2.172" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
   </ItemGroup>
   <ItemGroup>
