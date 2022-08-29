@@ -12,6 +12,7 @@ IHost host = Host.CreateDefaultBuilder(args)
                 .AddTransient<Ops.Agents.Octopus.OctopusAgent>()
                 .AddTransient<Ops.Agents.Azure.AzureAgent>()
                 .AddTransient<Ops.Agents.Amq.AmqAgent>()
+                .AddTransient<Ops.Agents.NewRelic.NewRelicAgent>()
                 .AddTransient<Ops.Agents.RedHat.Insights.InsightsAgent>();
 
         services.AddLogging(lf => lf.AddConsole());
