@@ -20,7 +20,7 @@ public class vSphereAgent : IOpsAgent
         _ingestApi = ingestApi;
     }
 
-    public string SourceName => "vsphere";
+    public string SourceName => "VMWare.vSphere";
 
     public async Task CollectAsync(AgentConfig agentConfig)
     {

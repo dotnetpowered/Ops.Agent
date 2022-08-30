@@ -1,6 +1,4 @@
-﻿using System.Reflection.PortableExecutable;
-using System.Security.AccessControl;
-using System.Text.Json;
+﻿using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Ops.Agents.Shared.Models;
 
@@ -17,7 +15,7 @@ public class AmqAgent : IOpsAgent
         _ingestApi = ingestApi;
     }
 
-    public string SourceName => "acitvemq";
+    public string SourceName => "AcitveMQ";
 
     public async Task CollectAsync(AgentConfig agentConfig)
     {

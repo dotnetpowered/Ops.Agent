@@ -17,7 +17,7 @@ public class RundeckAgent : IOpsAgent
         _ingestApi = ingestApi;
     }
 
-    public string SourceName => "rundeck";
+    public string SourceName => "PagerDuty.Rundeck";
 
     public async Task CollectAsync(AgentConfig agentConfig)
     {

@@ -26,25 +26,28 @@ public class Worker : BackgroundService
                 IOpsAgent? agent;
                 switch (agentConfig.Agent)
                 {
-                    case "amq":
+                    case "ActiveMQ":
                         agent = _provider.GetService<Amq.AmqAgent>();
                         break;
-                    case "azure":
-                        agent = _provider.GetService<Azure.AzureAgent>();
+                    case "Azure.UpdateService":
+                        agent = _provider.GetService<Azure.AzureUpdateAgent>();
                         break;
-                    case "octopus":
+                    case "Azure.Compute":
+                        agent = _provider.GetService<Azure.AzureComputeAgent>();
+                        break;
+                    case "OctopusDeploy":
                         agent = _provider.GetService<Octopus.OctopusAgent>();
                         break;
-                    case "redhat":
+                    case "RedHat.Insights":
                         agent = _provider.GetService<RedHat.Insights.InsightsAgent>();
                         break;
-                    case "rundeck":
+                    case "PagerDuty.Rundeck":
                         agent = _provider.GetService<Rundeck.RundeckAgent>();
                         break;
-                    case "vSphere":
+                    case "VMWare.vSphere":
                         agent = _provider.GetService<vSphere.vSphereAgent>();
                         break;
-                    case "zabbix":
+                    case "Zabbix":
                         agent = _provider.GetService<Zabbix.ZabbixAgent>();
                         break;
                     default:

@@ -17,7 +17,7 @@ public class OctopusAgent : IOpsAgent
         _ingestApi = ingestApi;
     }
 
-    public string SourceName => "octopus";
+    public string SourceName => "OctopusDeploy";
 
     public async Task CollectAsync(AgentConfig agentConfig)
     {

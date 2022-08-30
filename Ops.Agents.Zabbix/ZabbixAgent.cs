@@ -20,7 +20,7 @@ public class ZabbixAgent : IOpsAgent
         _ingestApi = ingestApi;
     }
 
-    public string SourceName => "zabbix";
+    public string SourceName => "Zabbix";
 
     public async Task CollectAsync(AgentConfig agentConfig)
     {
