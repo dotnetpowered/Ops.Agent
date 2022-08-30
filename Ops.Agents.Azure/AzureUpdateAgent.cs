@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using Azure;
 using Azure.Identity;
 using Azure.Monitor.Query;
 using Azure.Monitor.Query.Models;
@@ -9,37 +8,22 @@ using Ops.Agents.Shared.Models;
 namespace Ops.Agents.Azure;
 
 // -----------------------------------------------------------------------------
-// Azure Setup
-// -----------------------------------------------------------------------------
-// az ad sp create-for-rbac --name OpsAgent
-//
-// results:
-// {
-//   "appId": "<<app Id>>",
-//   "displayName": "OpsAgent",
-//   "password": "<< secret >>",
-//   "tenant": "<< tenant >>"
-// }
-//
-// az role assignment create --assignee "<<app Id>>" --role "Log Analytics Contributor" --resource-group "<<resource group>>"
-
-// -----------------------------------------------------------------------------
 // Azure Query Documentation
 // -----------------------------------------------------------------------------
 // https://docs.microsoft.com/en-us/azure/automation/update-management/query-logs
 
-public class AzureAgent : IOpsAgent
+public class AzureUpdateAgent : IOpsAgent
 {
-    private readonly ILogger<AzureAgent> _logger;
+    private readonly ILogger<AzureUpdateAgent> _logger;
     private readonly IOpsIngestApi _ingestApi;
 
-    public AzureAgent(ILogger<AzureAgent> logger, IOpsIngestApi ingestApi)
+    public AzureUpdateAgent(ILogger<AzureUpdateAgent> logger, IOpsIngestApi ingestApi)
     {
         _logger = logger;
         _ingestApi = ingestApi;
     }
 
-    public string SourceName => "azure";
+    public string SourceName => "Azure.Update";
 
     public async Task CollectAsync(AgentConfig agentConfig)
     {
@@ -50,7 +34,6 @@ public class AzureAgent : IOpsAgent
             throw new InvalidOperationException("Unable to load Computer_List.txt resource.");
         var streamreader = new StreamReader(stream);
         var query = streamreader.ReadToEnd();
-        DefaultAzureCredentialOptions op = new DefaultAzureCredentialOptions();
         var creds = new ClientSecretCredential(agentConfig.Tenant, agentConfig.Username, agentConfig.Password);
         var client = new LogsQueryClient(creds); // new DefaultAzureCredential(true));
         var response = await client.QueryWorkspaceAsync(agentConfig.Workspace, query,

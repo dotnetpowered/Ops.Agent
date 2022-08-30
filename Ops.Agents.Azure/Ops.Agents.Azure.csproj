@@ -9,10 +9,15 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
     <PackageReference Include="Azure.Monitor.Query" Version="1.1.0" />
     <PackageReference Include="Azure.Identity" Version="1.6.1" />
+    <PackageReference Include="Azure.ResourceManager" Version="1.3.1" />
+    <PackageReference Include="Azure.ResourceManager.Compute" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="Computer_List.txt" />
+    <None Remove="Microsoft.Azure.Management.Compute" />
+    <None Remove="Azure.ResourceManager" />
+    <None Remove="Azure.ResourceManager.Compute" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Computer_List.txt">
