@@ -1,0 +1,274 @@
+﻿resources
+| where type in~ (
+        "microsoft.compute/virtualmachines",
+        "microsoft.scvmm/virtualmachines",
+		"microsoft.connectedvmwarevsphere/virtualmachines",
+		"microsoft.azurestackhci/virtualmachines")
+| extend nics=array_length(properties.networkProfile.networkInterfaces)
+| extend customLocation = extract(@"(?:[^\/])+$", 0, tostring(extendedLocation.name))
+| extend modLocation = case (
+		location =~ 'eastus', 'East US',
+		location =~ 'eastus2', 'East US2',
+		location =~ 'westus', 'West US',
+		location =~ 'westus2', 'West US2',
+		location =~ 'southcentralus', 'South Central US',
+		location =~ 'westeurope', 'West Europe',
+		location =~ 'southeastasia', 'South East Asia',
+		location =~ 'northeurope', 'North Europe',
+		location =~ 'centralUS', 'Central US',
+		location)
+| extend location = iff(isnotempty(customLocation) and isnotnull(customLocation), strcat(customLocation, " (", modLocation, ")"), location)
+| mvexpand nic=properties.networkProfile.networkInterfaces limit 400
+| where (type == "microsoft.compute/virtualmachines" and nics == 1 or nic.properties.primary =~ 'true' or isempty(nic)) or type <> "microsoft.compute/virtualmachines"
+| project
+        id,
+        name,
+        resourceGroup,
+        type,
+        kind,
+        location,
+        edgeZone = iff(tostring(extendedLocation.type) =~ 'EdgeZone', tostring(extendedLocation.name), '-'),
+        subscriptionId,
+        tags,
+        licenseType=case(
+            properties.licenseType =~ 'Windows_Server', 'Azure Hybrid Benefit for Windows',
+            properties.licenseType =~ 'Windows_Client', 'Windows client with multi-tenant hosting',
+            properties.licenseType =~ 'RHEL_BYOS', 'Azure Hybrid Benefit for Redhat',
+            properties.licenseType =~ 'SLES_BYOS', 'Azure Hybrid Benefit for SUSE',
+            'Not enabled'
+        ),
+        nics = coalesce(tostring(nics), '-'),
+        zones = coalesce(tostring(zones[0]), '-'),
+        os = case(
+			properties.storageProfile.osDisk.osType =~ 'Windows' or properties.osProfile.osType =~ 'Windows', 'Windows',
+			properties.storageProfile.osDisk.osType =~ 'Linux' or properties.osProfile.osType =~ 'Linux', 'Linux',
+			'-'
+		),
+        publisher = coalesce(
+            tostring(properties.storageProfile.imageReference.publisher),
+            '-'
+        ),
+        offer = coalesce(
+            tostring(properties.storageProfile.imageReference.offer),
+            '-'
+        ),
+        sku = coalesce(
+            tostring(properties.storageProfile.imageReference.sku),
+            '-'
+        ),
+        usesManagedDisks = iff(
+            isnotempty(properties.storageProfile.osDisk.managedDisk), 'Yes',
+            'No'
+        ),
+        disks = case(
+				type == "microsoft.compute/virtualmachines", tostring(iff(isnotempty(properties.storageProfile.osDisk) and isnotnull(properties.storageProfile.osDisk), 1, 0) + coalesce(array_length(properties.storageProfile.dataDisks), 0)),
+				type == "microsoft.azurestackhci/virtualmachines", tostring(iff(isnotnull(properties.storageProfile.dataDisks) and isnotempty(properties.storageProfile.dataDisks), array_length(properties.storageProfile.dataDisks), 0)),
+				type == "microsoft.connectedvmwarevsphere/virtualmachines" or type == "microsoft.scvmm/virtualmachines", tostring(iff(isnotnull(properties.storageProfile.disks) and isnotempty(properties.storageProfile.disks), array_length(properties.storageProfile.disks), 0)),
+				'-'
+		),
+        source = coalesce(
+            case(
+                (isnotnull(properties.storageProfile.imageReference.publisher) and isnotempty(properties.storageProfile.imageReference.publisher)), 'Marketplace',
+                (isnotnull(properties.storageProfile.imageReference.id) and isnotempty(properties.storageProfile.imageReference.id) and properties.storageProfile.imageReference contains "Microsoft.Compute/images"), 'Image',
+                (isnotnull(properties.storageProfile.imageReference.id) and isnotempty(properties.storageProfile.imageReference.id) and properties.storageProfile.imageReference contains "Microsoft.Compute/galleries"), 'Shared image',
+                'Disk'
+            ),
+            '-'
+        ),
+        spotEvictionPolicy = case(
+            (properties.priority =~ "Low" or properties.priority =~ "Spot") and properties.evictionPolicy =~ "Deallocate", 'Stop / Deallocate',
+            (properties.priority =~ "Low" or properties.priority =~ "Spot"), 'Delete',
+            '-'
+        ),
+        spotEvictionType = case(
+            (properties.priority =~ "Low" or properties.priority =~ "Spot") and properties.billingProfile.maxPrice == -1, 'Capacity',
+            (properties.priority =~ "Low" or properties.priority =~ "Spot"), 'Price or capacity',
+            '-'
+        ),
+        spotPrice = case(
+            (properties.priority =~ "Low" or properties.priority =~ "Spot") and isnotnull(properties.billingProfile.maxPrice) and isnotempty(properties.billingProfile.maxPrice) and properties.billingProfile.maxPrice != -1, strcat("$ ", round(toreal(properties.billingProfile.maxPrice), 2)),
+            (properties.priority =~ "Low" or properties.priority =~ "Spot") and (isnull(properties.billingProfile.maxPrice) or isempty(properties.billingProfile.maxPrice)), 'Capacity',
+            '-'
+        ),
+        proximityPlacementGroup = coalesce(extract('/proximityPlacementGroups/(.*)', 1, tostring(properties.proximityPlacementGroup.id)), '-'),
+        host = coalesce(extract('/hosts/(.*)', 1, tostring(properties.host.id)), '-'),
+        availabilitySet = coalesce(extract('/availabilitySets/(.*)', 1, tostring(properties.availabilitySet.id)), '-'),
+        vmSize = coalesce(tostring(properties.hardwareProfile.vmSize), '-'),
+        computerName = coalesce(tostring(properties.extended.instanceView.computerName), tostring(properties.osProfile.computerName), '-'),
+        hyperVGeneration = coalesce(tostring(properties.extended.instanceView.hyperVGeneration), '-'),
+        securityType = case(
+            isnull(properties.securityProfile.securityType) or (properties.securityProfile.securityType =~ "Standard"), 'Standard',
+            properties.securityProfile.securityType =~ "TrustedLaunch", 'Trusted launch',
+            properties.securityProfile.securityType =~ "ConfidentialVm", 'Confidential',
+            '-'
+        ),
+        nicId = tostring(tolower(nic.id)),
+        powerState = coalesce(properties.powerState, properties.status.powerState, tostring(split(tolower(properties.extended.instanceView.powerState.code), "powerstate/")[1])),
+        provisioningState = tostring(properties.provisioningState),
+		scaleSet = coalesce(extract('/virtualMachineScaleSets/(.*)', 1, tostring(properties.virtualMachineScaleSet.id)), '-')
+| join kind=leftouter hint.strategy=shuffle (data 
+            | where type =~ 'Microsoft.Network/networkInterfaces' 
+            | extend ipConfigsCount=array_length(properties.ipConfigurations) 
+            | mvexpand ipconfig=properties.ipConfigurations limit 400
+            | where ipConfigsCount == 1 or ipconfig.properties.primary =~ 'true' 
+            | parse kind=regex tostring(ipconfig.properties.subnet.id) with '/virtualNetworks/' virtualNetwork '/subnets/' subnet 
+            | project
+                nicId=tolower(id),
+                publicIpId=tostring(ipconfig.properties.publicIPAddress.id),
+                privateIPAddress=tostring(ipconfig.properties.privateIPAddress),
+                subnet,
+                virtualNetwork,
+                lbReferences=array_concat(
+                    ipconfig.properties.loadBalancerInboundNatRules,
+                    ipconfig.properties.loadBalancerBackendAddressPools,
+                    ipconfig.properties.applicationGatewayBackendAddressPools))
+        on nicId
+| project-away nicId, nicId1
+| mvexpand lbRef=lbReferences limit 400
+| extend lbId=tolower(extract('(.*)/(inboundNatRules|backendAddressPool)', 1, tostring(lbRef.id)))
+| summarize tags = any(tags) by id, lbId, name, resourceGroup, type, kind, location, subscriptionId, licenseType, nics, zones, os, usesManagedDisks, publicIpId, disks, source, spotEvictionPolicy, spotEvictionType, spotPrice, proximityPlacementGroup, host, availabilitySet, vmSize, securityType, privateIPAddress, subnet, virtualNetwork, powerState, provisioningState, scaleSet, edgeZone, computerName, hyperVGeneration, publisher, offer, sku
+| join kind=leftouter hint.strategy=shuffle (data 
+            | where type =~ 'microsoft.network/publicipaddresses' 
+            | project publicIpId=tolower(id), publicIpAddress=tostring(properties.ipAddress), publicDnsName=tostring(properties.dnsSettings.fqdn))
+        on publicIpId
+| project-away publicIpId, publicIpId1
+| project id,
+        name,
+        resourceGroup,
+        type,
+        kind,
+        location,
+        subscriptionId,
+        tags,
+        nics,
+        os,
+        publisher,
+        offer,
+        sku,
+        status = case(
+            provisioningState =~ 'CREATING', 'Creating',
+            provisioningState =~ 'DELETING', 'Deleting',
+            (provisioningState =~ 'FAILED' and isnotnull(powerState) and isnotempty(powerState)), case(
+                powerState =~ 'RUNNING', 'Running',
+                powerState =~ 'POWEREDON', 'Running',
+                powerState =~ 'STOPPED', 'Stopped',
+                powerState =~ 'POWEREDOFF', 'Powered off',
+                powerState =~ 'DEALLOCATED', 'Stopped (deallocated)',
+                powerState =~ 'SUSPENDED', 'Suspended',
+                'Unknown'
+            ),
+            provisioningState =~ 'FAILED', 'Failed',
+            (provisioningState =~ 'SUCCEEDED' and isnotnull(powerState) and isnotempty(powerState)), case(
+                powerState =~ 'RUNNING', 'Running',
+                powerState =~ 'POWEREDON', 'Running',
+                powerState =~ 'STOPPED', 'Stopped',
+                powerState =~ 'POWEREDOFF', 'Powered off',
+                powerState =~ 'DEALLOCATED', 'Stopped (deallocated)',
+                powerState =~ 'SUSPENDED', 'Suspended',
+                powerState =~ 'STARTING', 'Starting',
+                'Unknown'
+            ),
+            (provisioningState =~ 'UPDATING' and isnotnull(powerState) and isnotempty(powerState)), case(
+                powerState =~ 'DEALLOCATING', 'Deallocating',
+                powerState =~ 'RUNNING', 'Running',
+                powerState =~ 'STARTING', 'Starting',
+                powerState =~ 'STOPPING', 'Stopping',
+                'Updating'
+            ),
+            'Unknown'
+        ),
+        disks,
+        availabilitySet,
+        vmSize,
+        securityType,
+        virtualNetwork = coalesce(virtualNetwork, '-'),
+        subnet = coalesce(subnet, '-'),
+        privateIPAddress = coalesce(privateIPAddress, '-'),
+        publicDnsName = coalesce(publicDnsName, '-'),
+        publicIpAddress = coalesce(publicIpAddress, '-'),
+        zones,
+        usesManagedDisks,
+        licenseType,
+        source,
+        spotEvictionPolicy,
+        spotEvictionType,
+        spotPrice,
+        proximityPlacementGroup,
+        host,
+		scaleSet = coalesce(scaleSet, '-'),
+		edgeZone = coalesce(edgeZone, '-'),
+        computerName,
+        hyperVGeneration
+| extend typeDisplayName=case(type =~ 'microsoft.compute/virtualmachines','Virtual machine',type =~ 'microsoft.scvmm/virtualmachines','SCVMM virtual machine - Azure Arc',type =~ 'microsoft.azurestackhci/virtualmachines','Azure Stack HCI virtual machine - Azure Arc',(type =~ 'microsoft.connectedvmwarevsphere/virtualmachines') and (kind =~ 'avs'),'AVS virtual machine',(type =~ 'microsoft.connectedvmwarevsphere/virtualmachines') and (kind =~ 'vmware'),'VMware virtual machine - Azure Arc',type =~ 'microsoft.connectedvmwarevsphere/virtualmachines','VMware + AVS virtual machine',type)
+| extend subscriptionDisplayName=case(subscriptionId =~ '296b9eff-a5fc-4a3a-9162-bc42aa17dc7d','Access to Azure Active Directory',subscriptionId =~ 'f0b5b120-1e76-47ed-9fe2-6d175b64b4ae','Microsoft Partner Network',subscriptionId)
+| extend locationDisplayName=case(location =~ 'eastus','East US',location =~ 'eastus2','East US 2',location =~ 'southcentralus','South Central US',location =~ 'westus2','West US 2',location =~ 'westus3','West US 3',location =~ 'australiaeast','Australia East',location =~ 'southeastasia','Southeast Asia',location =~ 'northeurope','North Europe',location =~ 'swedencentral','Sweden Central',location =~ 'uksouth','UK South',location =~ 'westeurope','West Europe',location =~ 'centralus','Central US',location =~ 'southafricanorth','South Africa North',location =~ 'centralindia','Central India',location =~ 'eastasia','East Asia',location =~ 'japaneast','Japan East',location =~ 'koreacentral','Korea Central',location =~ 'canadacentral','Canada Central',location =~ 'francecentral','France Central',location =~ 'germanywestcentral','Germany West Central',location =~ 'norwayeast','Norway East',location =~ 'switzerlandnorth','Switzerland North',location =~ 'uaenorth','UAE North',location =~ 'brazilsouth','Brazil South',location =~ 'qatarcentral','Qatar Central',location =~ 'centralusstage','Central US (Stage)',location =~ 'eastusstage','East US (Stage)',location =~ 'eastus2stage','East US 2 (Stage)',location =~ 'northcentralusstage','North Central US (Stage)',location =~ 'southcentralusstage','South Central US (Stage)',location =~ 'westusstage','West US (Stage)',location =~ 'westus2stage','West US 2 (Stage)',location =~ 'asia','Asia',location =~ 'asiapacific','Asia Pacific',location =~ 'australia','Australia',location =~ 'brazil','Brazil',location =~ 'canada','Canada',location =~ 'europe','Europe',location =~ 'france','France',location =~ 'germany','Germany',location =~ 'global','Global',location =~ 'india','India',location =~ 'japan','Japan',location =~ 'korea','Korea',location =~ 'norway','Norway',location =~ 'singapore','Singapore',location =~ 'southafrica','South Africa',location =~ 'switzerland','Switzerland',location =~ 'uae','United Arab Emirates',location =~ 'uk','United Kingdom',location =~ 'unitedstates','United States',location =~ 'unitedstateseuap','United States EUAP',location =~ 'eastasiastage','East Asia (Stage)',location =~ 'southeastasiastage','Southeast Asia (Stage)',location =~ 'northcentralus','North Central US',location =~ 'westus','West US',location =~ 'jioindiawest','Jio India West',location =~ 'westcentralus','West Central US',location =~ 'southafricawest','South Africa West',location =~ 'australiacentral','Australia Central',location =~ 'australiacentral2','Australia Central 2',location =~ 'australiasoutheast','Australia Southeast',location =~ 'japanwest','Japan West',location =~ 'jioindiacentral','Jio India Central',location =~ 'koreasouth','Korea South',location =~ 'southindia','South India',location =~ 'westindia','West India',location =~ 'canadaeast','Canada East',location =~ 'francesouth','France South',location =~ 'germanynorth','Germany North',location =~ 'norwaywest','Norway West',location =~ 'switzerlandwest','Switzerland West',location =~ 'ukwest','UK West',location =~ 'uaecentral','UAE Central',location =~ 'brazilsoutheast','Brazil Southeast',location)
+| where (type !~ ('qumulo.storage/filesystems'))
+| where (type !~ ('microsoft.agfoodplatform/farmbeats'))
+| where (type !~ ('microsoft.anybuild/clusters'))
+| where (type !~ ('microsoft.cdn/profiles/customdomains'))
+| where (type !~ ('microsoft.cdn/profiles/afdendpoints'))
+| where (type !~ ('microsoft.cdn/profiles/origingroups/origins'))
+| where (type !~ ('microsoft.cdn/profiles/origingroups'))
+| where (type !~ ('microsoft.cdn/profiles/afdendpoints/routes'))
+| where (type !~ ('microsoft.cdn/profiles/rulesets/rules'))
+| where (type !~ ('microsoft.cdn/profiles/rulesets'))
+| where (type !~ ('microsoft.cdn/profiles/secrets'))
+| where (type !~ ('microsoft.cdn/profiles/securitypolicies'))
+| where (type !~ ('microsoft.cloudtest/accounts'))
+| where (type !~ ('microsoft.cloudtest/hostedpools'))
+| where (type !~ ('microsoft.cloudtest/images'))
+| where (type !~ ('microsoft.cloudtest/pools'))
+| where (type !~ ('microsoft.containerservice/fleets'))
+| where (type !~ ('microsoft.kubernetes/connectedclusters/microsoft.kubernetesconfiguration/namespaces'))
+| where (type !~ ('microsoft.containerservice/managedclusters/microsoft.kubernetesconfiguration/namespaces'))
+| where (type !~ ('microsoft.kubernetes/connectedclusters/microsoft.kubernetesconfiguration/fluxconfigurations'))
+| where (type !~ ('microsoft.containerservice/managedclusters/microsoft.kubernetesconfiguration/fluxconfigurations'))
+| where (type !~ ('microsoft.portalservices/extensions/deployments'))
+| where (type !~ ('microsoft.portalservices/extensions'))
+| where (type !~ ('microsoft.portalservices/extensions/slots'))
+| where (type !~ ('microsoft.portalservices/extensions/versions'))
+| where (type !~ ('microsoft.datacollaboration/workspaces'))
+| where (type !~ ('microsoft.hdinsight/clusterpools/clusters'))
+| where (type !~ ('microsoft.hdinsight/clusterpools/clusters/sessionclusters'))
+| where (type !~ ('microsoft.hdinsight/clusterpools'))
+| where (type !~ ('microsoft.hpcworkbench/instances/chambers'))
+| where (type !~ ('microsoft.hpcworkbench/instances/chambers/accessprofiles'))
+| where (type !~ ('microsoft.hpcworkbench/instances/chambers/files'))
+| where (type !~ ('microsoft.hpcworkbench/instances/chambers/filerequests'))
+| where (type !~ ('microsoft.hpcworkbench/instances/chambers/licenses'))
+| where (type !~ ('microsoft.hpcworkbench/instances/chambers/storages'))
+| where (type !~ ('microsoft.hpcworkbench/instances/chambers/workloads'))
+| where (type !~ ('microsoft.hpcworkbench/instances/consortiums'))
+| where (type !~ ('microsoft.hpcworkbench/instances'))
+| where (type !~ ('microsoft.hpcworkbench/instances/sharedstorages'))
+| where (type !~ ('microsoft.networkfunction/azuretrafficcollectors'))
+| where (type !~ ('microsoft.network/virtualhubs')) or ((kind =~ ('routeserver')))
+| where (type !~ ('microsoft.metaverse/metaverses'))
+| where (type !~ ('microsoft.insights/diagnosticsettings'))
+| where not((type =~ ('microsoft.network/serviceendpointpolicies')) and ((kind =~ ('internal'))))
+| where (type !~ ('providers.test/statefulibizaengines'))
+| where (type !~ ('microsoft.openlogisticsplatform/workspaces'))
+| where (type !~ ('microsoft.scom/managedinstances'))
+| where (type !~ ('microsoft.orbital/edgesites'))
+| where (type !~ ('microsoft.orbital/groundstations'))
+| where (type !~ ('microsoft.orbital/l2connections'))
+| where (type !~ ('microsoft.azurepercept/accounts'))
+| where (type !~ ('microsoft.workloads/phpworkloads'))
+| where (type !~ ('microsoft.playfab/playeraccountpools'))
+| where (type !~ ('microsoft.playfab/playfabresources'))
+| where (type !~ ('microsoft.playfab/titles'))
+| where (type !~ ('microsoft.recommendationsservice/accounts/modeling'))
+| where (type !~ ('microsoft.recommendationsservice/accounts/serviceendpoints'))
+| where (type !~ ('microsoft.recoveryservicesbvtd2/vaults'))
+| where (type !~ ('microsoft.recoveryservicesbvtd/vaults'))
+| where (type !~ ('microsoft.recoveryservicesintd/vaults'))
+| where (type !~ ('microsoft.recoveryservicesintd2/vaults'))
+| where (type !~ ('microsoft.billingbenefits/savingsplanorders/savingsplans'))
+| where (type !~ ('microsoft.billingbenefits/savingsplanorders'))
+| where (type !~ ('microsoft.datareplication/replicationvaults'))
+| where (type !~ ('microsoft.storagecache/amlfilesystems'))
+| where not((type =~ ('microsoft.synapse/workspaces/sqlpools')) and ((kind =~ ('v3'))))
+| where (type !~ ('microsoft.connectedcache/ispcustomers'))
+| where not((type =~ ('microsoft.sql/servers/databases')) and ((kind in~ ('system','v2.0,system','v12.0,system','v12.0,user,datawarehouse,gen2,analytics'))))
+| where not((type =~ ('microsoft.sql/servers')) and ((kind =~ ('v12.0,analytics'))))
+| where ((type in~ ('microsoft.compute/virtualmachines','microsoft.scvmm/virtualmachines','microsoft.azurestackhci/virtualmachines'))) or ((type =~ ('microsoft.connectedvmwarevsphere/virtualmachines')) and ((kind =~ ('AVS')))) or ((type =~ ('microsoft.connectedvmwarevsphere/virtualmachines')) and ((kind =~ ('VMware'))))

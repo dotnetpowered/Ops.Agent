@@ -29,14 +29,14 @@ public class AzureUpdateAgent : IOpsAgent
     {
         // To get a list of resource names:
         // var names = this.GetType().GetTypeInfo().Assembly.GetManifestResourceNames();
-        var stream = this.GetType().GetTypeInfo().Assembly.GetManifestResourceStream("Ops.Agents.Azure.Computer_List.txt");
+        var stream = this.GetType().GetTypeInfo().Assembly.GetManifestResourceStream("Ops.Agents.Azure.ComputerUpdateSummary.txt");
         if (stream == null)
-            throw new InvalidOperationException("Unable to load Computer_List.txt resource.");
+            throw new InvalidOperationException("Unable to load ComputerUpdateSummary.txt resource.");
         var streamreader = new StreamReader(stream);
         var query = streamreader.ReadToEnd();
         var creds = new ClientSecretCredential(agentConfig.Tenant, agentConfig.Username, agentConfig.Password);
         var client = new LogsQueryClient(creds); // new DefaultAzureCredential(true));
-        var response = await client.QueryWorkspaceAsync(agentConfig.Workspace, query,
+        var response = await client.QueryWorkspaceAsync(agentConfig.Resource, query,
             new QueryTimeRange(TimeSpan.FromDays(1)));
 
         LogsTable table = response.Value.Table;
