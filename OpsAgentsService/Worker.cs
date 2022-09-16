@@ -35,6 +35,9 @@ public class Worker : BackgroundService
                     case "Azure.Compute":
                         agent = _provider.GetService<Azure.AzureComputeAgent>();
                         break;
+                    case "Aws.EC2":
+                        agent = _provider.GetService<Aws.AwsEc2Agent>();
+                        break;
                     case "OctopusDeploy":
                         agent = _provider.GetService<Octopus.OctopusAgent>();
                         break;

@@ -22,6 +22,7 @@
     <ProjectReference Include="..\Ops.Agents.Azure\Ops.Agents.Azure.csproj" />
     <ProjectReference Include="..\Ops.Agents.Amq\Ops.Agents.Amq.csproj" />
     <ProjectReference Include="..\Ops.Agents.NewRelic\Ops.Agents.NewRelic.csproj" />
+    <ProjectReference Include="..\Ops.Agents.Aws\Ops.Agents.Aws.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Refit" />

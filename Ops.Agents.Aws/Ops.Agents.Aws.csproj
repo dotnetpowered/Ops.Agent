@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.S3" Version="3.7.9.53" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+    <PackageReference Include="AWSSDK.EC2" Version="3.7.88" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ops.Agents.Shared\Ops.Agents.Shared.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Microsoft.Extensions.Logging" />
+    <None Remove="AWSSDK.EC2" />
+  </ItemGroup>
+</Project>
