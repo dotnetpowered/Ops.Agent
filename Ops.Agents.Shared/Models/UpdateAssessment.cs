@@ -4,9 +4,9 @@ namespace Ops.Agents.Shared.Models;
 
 public class UpdateAssessment : MachineResource
 {
-    public UpdateAssessment(string Id, string MachineName) : base(Id, MachineName)
+    public UpdateAssessment(string Id, string Source, string MachineName) : base(Id, Source, MachineName)
     {
-        this.PartitionKey = "update-assessment";
+        this.ResourceType = "update-assessment";
     }
 
     public DateTimeOffset? LastAccessedTime { get; set; }

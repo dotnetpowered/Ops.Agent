@@ -32,7 +32,7 @@ public class AwsEc2Agent : IOpsAgent
         {
             foreach (var instance in reservation.Instances)
             {
-                var vm = new VirtualMachine(instance.VpcId, instance.PrivateDnsName)
+                var vm = new VirtualMachine(instance.VpcId, this.SourceName, instance.PrivateDnsName)
                 {
                     Architecture = instance.Architecture.ToString(),
                     VmVersion = instance.Hypervisor.Value,
@@ -49,6 +49,6 @@ public class AwsEc2Agent : IOpsAgent
             }
         }
 
-        _ingestApi.UpsertResource(SourceName, )
+        await _ingestApi.UpsertResource(virtualMachines);
     }
 }

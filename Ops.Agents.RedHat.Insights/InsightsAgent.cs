@@ -27,7 +27,7 @@ public class InsightsAgent : IOpsAgent
         {
             var h = await insightsClient.Hosts.GetHostAsync(host.Id);
             var rhelHost = h.Results.FirstOrDefault().SystemProfile;
-            var m = new Machine(host.Id, host.Fqdn)
+            var m = new Machine(host.Id, this.SourceName, host.Fqdn)
             {
                 MemoryGB = (int)(rhelHost.SystemMemoryBytes / 1024 / 1024),
                 Architecture = rhelHost.Architecture,

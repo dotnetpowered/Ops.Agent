@@ -4,9 +4,9 @@ namespace Ops.Agents.Shared.Models;
 
 public class VirtualMachine : Machine
 {
-    public VirtualMachine(string Id, string MachineName) : base(Id, MachineName)
+    public VirtualMachine(string Id, string Source, string MachineName) : base(Id, Source, MachineName)
     {
-        this.PartitionKey = "virtual-machine";
+        this.ResourceType = "virtual-machine";
     }
 
     public string? GuestState { get; set; }

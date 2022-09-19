@@ -33,7 +33,7 @@ public class RundeckAgent : IOpsAgent
         await CollectExecutionsAsync(rundeckClient, projects);
     }
 
-    private static async Task CollectExecutionsAsync(RundeckClient rundeckClient, List<ProjectListingDto> projects)
+    private async Task CollectExecutionsAsync(RundeckClient rundeckClient, List<ProjectListingDto> projects)
     {
         var jobExecutions = new List<JobExecution>();
         foreach (var project in projects)
@@ -54,13 +54,13 @@ public class RundeckAgent : IOpsAgent
         //await dbClient.UpsertItemsAsync("Metrics", "Items", jobExecutions);
     }
 
-    private static IEnumerable<JobExecution> ToJobExecution(Execution e, IList<string> nodes, string executionStatus)
+    private IEnumerable<JobExecution> ToJobExecution(Execution e, IList<string> nodes, string executionStatus)
     {
         if (nodes == null)
             return Array.Empty<JobExecution>();
 
         return from node in nodes
-               select new JobExecution(e.Id.ToString() + "-" + node, node, e.Job.Name)
+               select new JobExecution(e.Id.ToString() + "-" + node, this.SourceName, node, e.Job.Name)
                {
                    Status = executionStatus,
                    StartTime = e.DateStarted.Date,
@@ -68,7 +68,7 @@ public class RundeckAgent : IOpsAgent
                };
     }
 
-    private static async Task CollectMachinesAsync(RundeckClient rundeckClient, List<ProjectListingDto> projects)
+    private async Task CollectMachinesAsync(RundeckClient rundeckClient, List<ProjectListingDto> projects)
     {
         var machines = new List<Machine>();
         foreach (var project in projects)
@@ -77,7 +77,7 @@ public class RundeckAgent : IOpsAgent
             // Get list of machines associated with project
             var resources = await rundeckClient.Projects.GetResourcesAsync(project.Name);
             var projectMachines = from r in resources
-                                  select new Machine(r.Key, r.Value.Hostname)
+                                  select new Machine(r.Key, this.SourceName, r.Value.Hostname)
                                   {
                                       OSName = r.Value.OsName,
                                       Architecture = r.Value.OsArch,
@@ -89,7 +89,8 @@ public class RundeckAgent : IOpsAgent
                               where !machines.Exists(m => m.Id == pm.Id)
                               select pm);
         }
-        //await dbClient.UpsertItemsAsync("Metrics", "Items", machines);
+
+        await _ingestApi.UpsertResource(machines);
     }
 }
 

@@ -66,6 +66,7 @@ public class AmqAgent : IOpsAgent
 
             var queueResource = new QueueResource(
                 $"{agentConfig.Server}.{destinationType}.{destinationName}",
+                this.SourceName,
                 agentConfig.Server, destinationName)
             {
                 ConsumerCount = ConsumerCount,
@@ -78,10 +79,7 @@ public class AmqAgent : IOpsAgent
             };
             queueList.Add(queueResource);
         }
-        //_ingestApi.UpsertResource(SOURCE_NAME)
-
-        //await dbClient.UpsertItemsAsync("Metrics", "Items", queueList);
-
+        await _ingestApi.UpsertResource(queueList);
     }
 }
 

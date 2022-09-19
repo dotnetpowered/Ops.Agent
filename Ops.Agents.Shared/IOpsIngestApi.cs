@@ -5,8 +5,8 @@ namespace Ops.Agents;
 
 public interface IOpsIngestApi
 {
-    [Post("/api/OpsApiIngest")]
-    Task<IngestResult> UpsertResource(string source, string code, [Body] string resourceJson);
+    [Post("")]
+    Task<IngestResult> UpsertResource([Body] object resource);
 }
 
 public class IngestResult

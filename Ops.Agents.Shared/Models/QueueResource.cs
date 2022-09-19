@@ -4,10 +4,10 @@ namespace Ops.Agents.Shared.Models;
 
 public class QueueResource : MachineResource
 {
-    public QueueResource(string Id, string MachineName, string QueueName) : base(Id, MachineName)
+    public QueueResource(string Id, string Source, string MachineName, string QueueName) : base(Id, Source, MachineName)
     {
         this.QueueName = QueueName;
-        this.PartitionKey = "queue";
+        this.ResourceType = "queue";
     }
 
     public string QueueName { get; set; }

@@ -5,12 +5,12 @@ namespace Ops.Agents.Shared.Models;
 
 public class Machine : Asset
 {
-    public Machine(string Id, string MachineName) : base(Id, "Machine")
+    public Machine(string Id, string Source, string MachineName) : base(Id, Source, "Machine")
     {
         this.MachineName = MachineName.ToLower();
         if (!this.MachineName.Contains('.'))
             this.MachineName = MachineName + ".us.xeohealth.com";
-        this.PartitionKey = "machine";
+        this.ResourceType = "machine";
         this.Group = new List<string>();
         this.IpAddress = new List<string>();
         this.Tags = new ExpandoObject();

@@ -65,6 +65,7 @@ public class vSphereAgent : IOpsAgent
                        where GetString(element, "HostName")!=null
                        select new VirtualMachine(
                                     GetString(element, "Id"),
+                                    this.SourceName,
                                     GetString(element, "HostName"))
                        {
                            Description = GetString(element, "Name"),
@@ -83,7 +84,7 @@ public class vSphereAgent : IOpsAgent
                            GuestState = GetIntAsString(element, "GuestState"),
                            CreateDate = GetStringAsDateTime(element, "CreateDate")
                        };
-        //await dbClient.UpsertItemsAsync("Metrics", "Items", machines);
+        await _ingestApi.UpsertResource(machines);
     }
 
     string GetHostName(JsonElement element)

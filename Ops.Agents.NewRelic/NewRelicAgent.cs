@@ -52,7 +52,7 @@ public class NewRelicAgent : IOpsAgent
         foreach (var item in graphQLResponse.Data.actor.entitySearch.results.entities)
         {
             var fullName = item.GetTagValue("fullHostname");
-            var machine = new Machine(item.guid, fullName)
+            var machine = new Machine(item.guid, this.SourceName, fullName)
             {
                 NumCpu = item.GetTagValueInt("processorCount"),
                 MemoryGB = (int) (item.GetTagValueDouble("systemMemoryBytes") / 1024 / 1024),
@@ -67,6 +67,8 @@ public class NewRelicAgent : IOpsAgent
             };
             machines.Add(machine);
         }
+
+        await _ingestApi.UpsertResource(machines);
     }
 }
 

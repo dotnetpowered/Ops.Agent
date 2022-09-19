@@ -4,10 +4,10 @@ namespace Ops.Agents.Shared.Models;
 
 public class Deployment : JobExecution
 {
-    public Deployment(string Id, string MachineName, string Description) : base(Id, MachineName, Description)
+    public Deployment(string Id, string Source, string MachineName, string Description) : base(Id, Source, MachineName, Description)
     {
         this.Description = Description;
-        this.PartitionKey = "deployment";
+        this.ResourceType = "deployment";
     }
 
     public string? ReleaseId { get; set; }

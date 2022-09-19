@@ -44,7 +44,7 @@ public class AzureUpdateAgent : IOpsAgent
         List<UpdateAssessment> items = new();
         foreach (var row in table.Rows)
         {
-            var item = new UpdateAssessment((string)row["id"], (string)row["displayName"])
+            var item = new UpdateAssessment((string)row["id"], this.SourceName, (string)row["displayName"])
             {
                 LastAccessedTime = (DateTimeOffset)row["lastAssessedTime"],
                 Compliance = (long)row["compliance"] == 1,
@@ -55,6 +55,6 @@ public class AzureUpdateAgent : IOpsAgent
             };
             items.Add(item);
         }
-        //await dbClient.UpsertItemsAsync("Metrics", "Items", items);
+        await _ingestApi.UpsertResource(items);
     }
 }

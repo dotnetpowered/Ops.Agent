@@ -46,7 +46,7 @@ public class OctopusAgent : IOpsAgent
                 var project = dashboard.Projects.Find(p => p.Id == item.ProjectId);
                 var environment = dashboard.Environments.Find(e => e.Id == item.EnvironmentId);
                 var machineName = new Uri(machines.First().Uri).Host;
-                var deployment = new Deployment(item.DeploymentId, machineName, project.Name)
+                var deployment = new Deployment(item.DeploymentId, this.SourceName, machineName, project.Name)
                 {
                     ProjectId = item.ProjectId,
                     ReleaseId = item.ReleaseId,
@@ -65,7 +65,7 @@ public class OctopusAgent : IOpsAgent
         }
 
 
-        //await dbClient1.UpsertItemsAsync("Metrics", "Items", deployments);
+        await _ingestApi.UpsertResource(deployments);
     }
 
     private static (DashboardResource dashboard, List<OctopusMachineResource> allMachines,
@@ -84,11 +84,11 @@ public class OctopusAgent : IOpsAgent
         return (dashboard, allMachines, deploymentResources);
     }
 
-    public static async Task CollectMachines(List<OctopusMachineResource> allMachines)
+    public async Task CollectMachines(List<OctopusMachineResource> allMachines)
     {
         var uri = new Uri(allMachines.Last().Uri);
         var deploymentTargets = from m in allMachines
-                                select new DeploymentTarget(m.Id, new Uri(m.Uri).Host)
+                                select new DeploymentTarget(m.Id, this.SourceName, new Uri(m.Uri).Host)
                                 {
                                     Group = (from e in m.EnvironmentIds select e).ToList(),
                                     OSName = m.OperatingSystem,
@@ -96,7 +96,8 @@ public class OctopusAgent : IOpsAgent
                                     PowerState = m.HealthStatus.ToString(),
                                     Architecture = m.Architecture
                                 };
-        //await client1.UpsertItemsAsync("Metrics", "Items", deploymentTargets);
+
+        await _ingestApi.UpsertResource(deploymentTargets);
     }
 
 }

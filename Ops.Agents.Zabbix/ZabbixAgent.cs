@@ -36,7 +36,7 @@ public class ZabbixAgent : IOpsAgent
             var hosts = context.Hosts.Get(null, hostInclude, p);
 
             var machines = from h in hosts
-                           select new Machine(h.Id, h.host)
+                           select new Machine(h.Id, this.SourceName, h.host)
                            {
                                Group = (from g in h.groups select g.name).ToList(),
                                PowerState = h.status.ToString(),
@@ -45,7 +45,7 @@ public class ZabbixAgent : IOpsAgent
                                Architecture = GetArchitecture(h),
                                Tags = GetTags(h)
                            };
-           // await dbClient.UpsertItemsAsync("Metrics", "Items", machines);
+            await _ingestApi.UpsertResource(machines);
         }
     }
 

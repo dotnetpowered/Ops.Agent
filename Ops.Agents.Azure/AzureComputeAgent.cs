@@ -38,9 +38,11 @@ public class AzureComputeAgent : IOpsAgent
         var qc = new QueryContent(query);
         var queryResult = tenant.Resources(qc);
         var resources = queryResult.Value.Data.ToObjectFromJson() as Object[];
+
+        List<VirtualMachine> virtualMachines = new();
         foreach (Dictionary<string,object> resource in resources)
         {
-            var vm = new VirtualMachine(resource["id"].ToString(), resource["name"].ToString())
+            var vm = new VirtualMachine(resource["id"].ToString(), this.SourceName, resource["name"].ToString())
             {
                 OSName = resource["offer"].ToString() + " [" + resource["publisher"].ToString() + "]",
                 PowerState = resource["status"].ToString(),
@@ -51,7 +53,11 @@ public class AzureComputeAgent : IOpsAgent
                 VmVersion = resource["hyperVGeneration"].ToString()
             };
             vm.IpAddress.Add(resource["privateIPAddress"].ToString());
+            virtualMachines.Add(vm);
         }
+
+        await _ingestApi.UpsertResource(virtualMachines);
+
 
         //var client = new ArmClient(creds);
         //string resourceGroupName = agentConfig.Resource;

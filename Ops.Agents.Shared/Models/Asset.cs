@@ -5,18 +5,21 @@ namespace Ops.Agents.Shared.Models;
 
 public abstract class Asset
 {
-    public Asset(string Id, string AssetType)
+    public Asset(string Id, string Source, string AssetType)
     {
         this.Id = Id;
-        this.PartitionKey = "asset";
+        this.ResourceType = "asset";
         this.AsOf = DateTime.Now;
         this.AssetType = AssetType;
+        this.Source = Source;
     }
 
     [JsonProperty(PropertyName = "id")]
     public string Id { get; set; }
-    [JsonProperty(PropertyName = "partitionKey")]
-    public string PartitionKey { get; set; }
+    [JsonProperty(PropertyName = "resourceType")]
+    public string ResourceType { get; set; }
+    [JsonProperty(PropertyName = "source")]
+    public string Source { get; set; }
     public DateTime? AsOf { get; set; }
     public string AssetType { get; set; } // Machine, Cabinet, Switch, etc.
     public string? Location { get; set; } // Physical Location (City, State)
