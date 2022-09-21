@@ -11,7 +11,6 @@ public class QueueResource : MachineResource
     }
 
     public string QueueName { get; set; }
-    public string ResourceType { get; set; }
     public long? QueueSize { get; set; }
     public long? ConsumerCount { get; set; }
     public long? EnqueueCount { get; set; }

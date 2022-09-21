@@ -23,7 +23,8 @@ public class Worker : BackgroundService
 
             foreach (var agentConfig in _config)
             {
-                IOpsAgent? agent;
+                IOpsAgent? agent = null;
+                _logger.LogInformation($"Running agent: {agentConfig.Agent}");
                 switch (agentConfig.Agent)
                 {
                     case "ActiveMQ":
@@ -57,7 +58,8 @@ public class Worker : BackgroundService
                         _logger.LogWarning($"Unknown agent name: {agentConfig.Agent}. Skippping collection.");
                         continue;
                 }
-                await agent.CollectAsync(agentConfig);
+                if (agent != null)
+                    await agent.CollectAsync(agentConfig);
             }
 
             await Task.Delay(1000, stoppingToken);

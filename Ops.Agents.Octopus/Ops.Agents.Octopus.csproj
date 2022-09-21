@@ -11,11 +11,10 @@
     <None Remove="Microsoft.Extensions.Logging.Abstractions" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Octopus.Client" Version="14.1.226" />
+    <PackageReference Include="Octopus.Client" Version="14.2.236" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Ops.Shared\Ops.Shared.csproj" />
     <ProjectReference Include="..\Ops.Agents.Shared\Ops.Agents.Shared.csproj" />
   </ItemGroup>
 </Project>

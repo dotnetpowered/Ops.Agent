@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Ops.Shared\Ops.Shared.csproj" />
     <ProjectReference Include="..\Ops.Agents.Shared\Ops.Agents.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>

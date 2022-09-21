@@ -30,7 +30,7 @@ IHost host = Host.CreateDefaultBuilder(args)
 
         services
             .AddRefitClient<IOpsIngestApi>()
-            .ConfigureHttpClient(c => c.BaseAddress = new Uri(Configuration["Ingest:Url"]));
+            .ConfigureHttpClient(c => c.BaseAddress = new Uri(Configuration["ingest:url"]));
     })
     .Build();
 

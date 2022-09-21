@@ -15,6 +15,6 @@ public class UpdateAssessment : MachineResource
     public long MissingOtherUpdatesCount { get; set; }
     public bool Compliance { get; set; }
     public DateTimeOffset? LastUpdateAgentSeenTime { get; set; }
-    public string ComputerEnvironment { get; set; }
+    public string? ComputerEnvironment { get; set; }
 }
 
