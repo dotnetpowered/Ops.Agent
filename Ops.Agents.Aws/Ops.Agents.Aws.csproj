@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.S3" Version="3.7.9.53" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.9.56" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
-    <PackageReference Include="AWSSDK.EC2" Version="3.7.88" />
+    <PackageReference Include="AWSSDK.EC2" Version="3.7.90.1" />
   </ItemGroup>
 
   <ItemGroup>
