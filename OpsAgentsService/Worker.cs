@@ -24,29 +24,36 @@ public class Worker : BackgroundService
             foreach (var agentConfig in _config)
             {
                 IOpsAgent? agent = null;
+                var agentFound = true;
                 _logger.LogInformation($"Running agent: {agentConfig.Agent}");
                 switch (agentConfig.Agent)
                 {
                     case "ActiveMQ":
                         agent = _provider.GetService<Amq.AmqAgent>();
                         break;
-                    case "Azure.UpdateService":
-                        agent = _provider.GetService<Azure.AzureUpdateAgent>();
+                    case "Aws.EC2":
+                        agent = _provider.GetService<Aws.AwsEc2Agent>();
                         break;
                     case "Azure.Compute":
                         agent = _provider.GetService<Azure.AzureComputeAgent>();
                         break;
-                    case "Aws.EC2":
-                        agent = _provider.GetService<Aws.AwsEc2Agent>();
+                    case "Azure.UpdateService":
+                        agent = _provider.GetService<Azure.AzureUpdateAgent>();
                         break;
-                    case "OctopusDeploy":
+                    case "Google.Compute":
+                        agent = _provider.GetService<Google.Cloud.GoogleComputeAgent>();
+                        break;
+                    case "Octopus.Deploy":
                         agent = _provider.GetService<Octopus.OctopusAgent>();
                         break;
-                    case "RedHat.Insights":
-                        agent = _provider.GetService<RedHat.Insights.InsightsAgent>();
+                    case "NewRelic":
+                        agent = _provider.GetService<NewRelic.NewRelicAgent>();
                         break;
                     case "PagerDuty.Rundeck":
                         agent = _provider.GetService<Rundeck.RundeckAgent>();
+                        break;
+                    case "RedHat.Insights":
+                        agent = _provider.GetService<RedHat.Insights.InsightsAgent>();
                         break;
                     case "VMWare.vSphere":
                         agent = _provider.GetService<vSphere.vSphereAgent>();
@@ -56,10 +63,13 @@ public class Worker : BackgroundService
                         break;
                     default:
                         _logger.LogWarning($"Unknown agent name: {agentConfig.Agent}. Skippping collection.");
+                        agentFound = false;
                         continue;
                 }
                 if (agent != null)
                     await agent.CollectAsync(agentConfig);
+                else if (agentFound)
+                    throw new InvalidOperationException($"Missing DI for agent: {agentConfig.Agent}");
             }
 
             await Task.Delay(1000, stoppingToken);

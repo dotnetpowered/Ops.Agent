@@ -22,6 +22,7 @@ IHost host = Host.CreateDefaultBuilder(args)
                 .AddTransient<Ops.Agents.Amq.AmqAgent>()
                 .AddTransient<Ops.Agents.Aws.AwsEc2Agent>()
                 .AddTransient<Ops.Agents.NewRelic.NewRelicAgent>()
+                .AddTransient<Ops.Agents.Google.Cloud.GoogleComputeAgent>()
                 .AddTransient<Ops.Agents.RedHat.Insights.InsightsAgent>();
 
         services.AddLogging(lf => lf.AddConsole());
@@ -30,7 +31,7 @@ IHost host = Host.CreateDefaultBuilder(args)
 
         services
             .AddRefitClient<IOpsIngestApi>()
-            .ConfigureHttpClient(c => c.BaseAddress = new Uri(Configuration["ingest:url"]));
+            .ConfigureHttpClient(c => c.BaseAddress = new Uri(Configuration["service:ingestUrl"]));
     })
     .Build();
 

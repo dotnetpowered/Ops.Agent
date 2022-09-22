@@ -9,6 +9,7 @@ public class VirtualMachine : Machine
         this.ResourceType = "virtual-machine";
     }
 
+    public string? MachineType { get; set; }
     public string? GuestState { get; set; }
     public string? GuestFamily { get; set; }
     public string? DrsAutomationLevel { get; set; }

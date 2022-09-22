@@ -8,6 +8,7 @@ public class AgentConfig
 	public string? Url { get; set; }
     public string? Tenant { get; set; }
     public string? Region { get; set; }
+    public string? Project { get; set; }
     public string? Resource { get; set; }
     public string? Username { get; set; }
 	public string? Password { get; set; }
