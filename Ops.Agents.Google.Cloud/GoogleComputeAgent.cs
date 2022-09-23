@@ -37,7 +37,6 @@ public class GoogleComputeAgent : IOpsAgent
         {
             // The result contains a KeyValuePair collection, where the key is a zone and the value
             // is a collection of instances in that zone.
-            Console.WriteLine($"Instances for zone: {instancesByZone.Key}");
             foreach (var instance in instancesByZone.Value.Instances)
             {
                 var vm = new VirtualMachine(instance.Id.ToString(), this.SourceName, instance.Name)
@@ -62,9 +61,9 @@ public class GoogleComputeAgent : IOpsAgent
                 vm.IpAddress = (from net in instance.NetworkInterfaces
                                 select net.NetworkIP).ToList();
 
-                vm.Tags = instance.Tags.Items;
-                // Tags
-                // Labels
+                var tags = new List<string>();
+                tags.AddRange(instance.Tags.Items);
+                tags.AddRange(from label in instance.Labels select label.Value);
 
                 virtualMachines.Add(vm);
             }
