@@ -7,12 +7,14 @@ public class Worker : BackgroundService
     private readonly ILogger<Worker> _logger;
     private readonly AgentConfig[] _config;
     private readonly IServiceProvider _provider;
+    private readonly int _pollingFrequency;
 
     public Worker(ILogger<Worker> logger, IConfiguration configuration, IServiceProvider provider)
     {
         _logger = logger;
         _config = configuration.GetSection("agents").Get<AgentConfig[]>();
         _provider = provider;
+        _pollingFrequency = int.Parse(configuration["service:pollingFrequency"]);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -72,7 +74,7 @@ public class Worker : BackgroundService
                     throw new InvalidOperationException($"Missing DI for agent: {agentConfig.Agent}");
             }
 
-            await Task.Delay(1000, stoppingToken);
+            await Task.Delay(_pollingFrequency * 1000, stoppingToken);
         }
     }
 }
