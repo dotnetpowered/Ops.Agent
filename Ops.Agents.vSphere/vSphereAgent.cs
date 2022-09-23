@@ -32,7 +32,7 @@ public class vSphereAgent : IOpsAgent
 
         // Load query from embedded resource
         var assembly = Assembly.GetExecutingAssembly();
-        var stream = assembly.GetManifestResourceStream("vmware_serverlist.ps1");
+        var stream = assembly.GetManifestResourceStream("Ops.Agents.vSphere.vmware_serverlist.ps1");
         if (stream == null)
             throw new InvalidOperationException("Unable to load vmware_serverlist.ps1 resource.");
         var streamreader = new StreamReader(stream);
