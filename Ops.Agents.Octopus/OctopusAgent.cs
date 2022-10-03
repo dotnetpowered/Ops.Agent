@@ -41,13 +41,14 @@ public class OctopusAgent : IOpsAgent
         {
             var deploymentResource = deploymentResources.Find(d => d.Id == item.DeploymentId);
             var machines = allMachines.FindAll(m => deploymentResource.DeployedToMachineIds.Contains(m.Id));
-            if (machines.Any())
+            foreach (var machine in machines)
             {
                 var project = dashboard.Projects.Find(p => p.Id == item.ProjectId);
                 var environment = dashboard.Environments.Find(e => e.Id == item.EnvironmentId);
-                var machineName = new Uri(machines.First().Uri).Host;
-                var deployment = new Deployment(item.DeploymentId, this.SourceName, machineName, project.Name)
+                var machineName = new Uri(machine.Uri).Host;
+                var deployment = new Deployment(item.ProjectId+'-'+machineName, this.SourceName, machineName, project.Name)
                 {
+                    DeploymentId = item.DeploymentId,
                     ProjectId = item.ProjectId,
                     ReleaseId = item.ReleaseId,
                     ReleaseVersion = item.ReleaseVersion,
@@ -55,17 +56,16 @@ public class OctopusAgent : IOpsAgent
                     StopTime = item.CompletedTime,
                     Status = item.State.ToString(),
                     EnvironmentId = item.EnvironmentId,
-                    EnvironmentName = environment.Name,
+                    Environment = environment.Name,
                     DeployedBy = deploymentResource.DeployedBy,
                 };
                 deployments.Add(deployment);
             }
-            else
+            if (!machines.Any())
                 _logger.LogWarning($"No machines found for {item.Id}. Skipping.");
         }
 
-
-        await _ingestApi.UpsertResource(deployments);
+        await _ingestApi.IngestResource(deployments);
     }
 
     private static (DashboardResource dashboard, List<OctopusMachineResource> allMachines,
@@ -97,7 +97,7 @@ public class OctopusAgent : IOpsAgent
                                     Architecture = m.Architecture
                                 };
 
-        await _ingestApi.UpsertResource(deploymentTargets);
+        //await _ingestApi.UpsertResource(deploymentTargets);
     }
 
 }
