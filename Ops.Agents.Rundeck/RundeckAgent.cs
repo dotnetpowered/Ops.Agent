@@ -42,16 +42,17 @@ public class RundeckAgent : IOpsAgent
 
             foreach (var job in jobs)
             {
-                var executions = await rundeckClient.Jobs.GetExecutionsAsync(job.Id, 0, 5);
+                _logger.LogInformation($"Collecting Executions for job: {project.Name} {job.Name}");
+                var executions = await rundeckClient.Jobs.GetExecutionsAsync(job.Id, 0, 1);
 
                 foreach (var e in executions.Executions)
                 {
                     jobExecutions.AddRange(ToJobExecution(e, e.SuccessfulNodes, "Success"));
-                    jobExecutions.AddRange(ToJobExecution(e, e.FailedNodes, "Failed"));
+                    jobExecutions.AddRange(ToJobExecution(e, e.FailedNodes, "Failure"));
                 }
             }
         }
-        //await dbClient.UpsertItemsAsync("Metrics", "Items", jobExecutions);
+        await _ingestApi.IngestResource(jobExecutions);
     }
 
     private IEnumerable<JobExecution> ToJobExecution(Execution e, IList<string> nodes, string executionStatus)
@@ -60,8 +61,9 @@ public class RundeckAgent : IOpsAgent
             return Array.Empty<JobExecution>();
 
         return from node in nodes
-               select new JobExecution(e.Id.ToString() + "-" + node, this.SourceName, node, e.Job.Name)
+               select new JobExecution(e.Job.Id.ToString() + "-" + node, this.SourceName, node, e.Job.Name)
                {
+                   ExecutionId = e.Id.ToString(),
                    Status = executionStatus,
                    StartTime = e.DateStarted.Date,
                    StopTime = e.DateEnded.Date
@@ -90,7 +92,7 @@ public class RundeckAgent : IOpsAgent
                               select pm);
         }
 
-        await _ingestApi.UpsertResource(machines);
+        await _ingestApi.IngestResource(machines);
     }
 }
 

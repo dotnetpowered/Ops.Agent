@@ -12,8 +12,9 @@ public class Deployment : JobExecution
 
     public string? ReleaseId { get; set; }
     public string? ReleaseVersion { get; set; }
+    public string? DeploymentId { get; set; }
     public string? ProjectId { get; set; }
     public string? EnvironmentId { get; set; }
-    public string? EnvironmentName { get; set; }
+    public string? Environment { get; set; }
     public string? DeployedBy { get; set; }
 }

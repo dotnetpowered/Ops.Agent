@@ -8,12 +8,14 @@ namespace Ops.Agents.RedHat.Insights;
 public class InsightsAgent : IOpsAgent
 {
     readonly ILogger<InsightsClient> _logger;
+    readonly IOpsIngestApi _ingestApi;
 
-    public string SourceName => "redhat.insights";
+    public string SourceName => "RedHat.Insights";
 
-    public InsightsAgent(ILogger<InsightsClient> logger)
+    public InsightsAgent(ILogger<InsightsClient> logger, IOpsIngestApi ingestApi)
     {
         _logger = logger;
+        _ingestApi = ingestApi;
     }
 
     public async Task CollectAsync(AgentConfig agentConfig)
@@ -38,6 +40,7 @@ public class InsightsAgent : IOpsAgent
             };
             machines.Add(m);
         }
+        await _ingestApi.IngestResource(machines);
     }
 }
 

@@ -12,6 +12,7 @@ public class JobExecution : MachineResource
 
     public string Description { get; set; }
     public string? Status { get; set; }
+    public string ExecutionId { get; set; }
     public DateTimeOffset? StartTime { get; set; }
     public DateTimeOffset? StopTime { get; set; }
 }
