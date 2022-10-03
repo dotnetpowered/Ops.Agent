@@ -57,6 +57,9 @@ public class Worker : BackgroundService
                     case "RedHat.Insights":
                         agent = _provider.GetService<RedHat.Insights.InsightsAgent>();
                         break;
+                    case "SqlServer":
+                        agent = _provider.GetService<SqlServer.SqlServerAgent>();
+                        break;
                     case "VMWare.vSphere":
                         agent = _provider.GetService<vSphere.vSphereAgent>();
                         break;

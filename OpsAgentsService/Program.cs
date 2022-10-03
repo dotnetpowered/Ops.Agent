@@ -23,6 +23,7 @@ IHost host = Host.CreateDefaultBuilder(args)
                 .AddTransient<Ops.Agents.Aws.AwsEc2Agent>()
                 .AddTransient<Ops.Agents.NewRelic.NewRelicAgent>()
                 .AddTransient<Ops.Agents.Google.Cloud.GoogleComputeAgent>()
+                .AddTransient<Ops.Agents.SqlServer.SqlServerAgent>()
                 .AddTransient<Ops.Agents.RedHat.Insights.InsightsAgent>();
 
         services.AddLogging(lf => lf.AddConsole());

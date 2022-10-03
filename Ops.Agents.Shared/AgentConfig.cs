@@ -14,4 +14,5 @@ public class AgentConfig
 	public string? Password { get; set; }
 	public int?    Port { get; set; }
 	public string? ApiToken { get; set; }
+    public string? ConnectionString { get; set; }
 }
