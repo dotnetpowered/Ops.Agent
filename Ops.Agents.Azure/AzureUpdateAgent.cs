@@ -3,6 +3,7 @@ using Azure.Identity;
 using Azure.Monitor.Query;
 using Azure.Monitor.Query.Models;
 using Microsoft.Extensions.Logging;
+using Ops.Agents.Shared;
 using Ops.Agents.Shared.Models;
 
 namespace Ops.Agents.Azure;
@@ -27,13 +28,7 @@ public class AzureUpdateAgent : IOpsAgent
 
     public async Task CollectAsync(AgentConfig agentConfig)
     {
-        // To get a list of resource names:
-        // var names = this.GetType().GetTypeInfo().Assembly.GetManifestResourceNames();
-        var stream = this.GetType().GetTypeInfo().Assembly.GetManifestResourceStream("Ops.Agents.Azure.ComputerUpdateSummary.txt");
-        if (stream == null)
-            throw new InvalidOperationException("Unable to load ComputerUpdateSummary.txt resource.");
-        var streamreader = new StreamReader(stream);
-        var query = streamreader.ReadToEnd();
+        string query = ResourceUtils.LoadEmbeddedResource<AzureUpdateAgent>("ComputerUpdateSummary.txt");
         var creds = new ClientSecretCredential(agentConfig.Tenant, agentConfig.Username, agentConfig.Password);
         var client = new LogsQueryClient(creds); // new DefaultAzureCredential(true));
         var response = await client.QueryWorkspaceAsync(agentConfig.Resource, query,
@@ -55,6 +50,6 @@ public class AzureUpdateAgent : IOpsAgent
             };
             items.Add(item);
         }
-        await _ingestApi.UpsertResource(items);
+        await _ingestApi.IngestResource(items);
     }
 }

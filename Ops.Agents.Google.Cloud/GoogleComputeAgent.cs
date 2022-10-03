@@ -69,7 +69,7 @@ public class GoogleComputeAgent : IOpsAgent
             }
         }
 
-        await _ingestApi.UpsertResource(virtualMachines);
+        await _ingestApi.IngestResource(virtualMachines);
     }
 
 }

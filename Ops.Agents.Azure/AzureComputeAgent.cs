@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Ops.Agents.Shared.Models;
 using System.Reflection;
 using System.Text.Json;
+using Ops.Agents.Shared;
 
 namespace Ops.Agents.Azure;
 
@@ -27,11 +28,7 @@ public class AzureComputeAgent : IOpsAgent
 
     public async Task CollectAsync(AgentConfig agentConfig)
     {
-        var stream = this.GetType().GetTypeInfo().Assembly.GetManifestResourceStream("Ops.Agents.Azure.VirtualMachines.txt");
-        if (stream == null)
-            throw new InvalidOperationException("Unable to load VirtualMachines.txt resource.");
-        var streamreader = new StreamReader(stream);
-        var query = streamreader.ReadToEnd();
+        string query = ResourceUtils.LoadEmbeddedResource<AzureUpdateAgent>("VirtualMachines.txt");
         var creds = new ClientSecretCredential(agentConfig.Tenant, agentConfig.Username, agentConfig.Password);
         var client = new ArmClient(creds);
         TenantResource tenant = client.GetTenants().FirstOrDefault();
@@ -56,7 +53,7 @@ public class AzureComputeAgent : IOpsAgent
             virtualMachines.Add(vm);
         }
 
-        await _ingestApi.UpsertResource(virtualMachines);
+        await _ingestApi.IngestResource(virtualMachines);
 
 
         //var client = new ArmClient(creds);

@@ -79,7 +79,7 @@ public class AmqAgent : IOpsAgent
             };
             queueList.Add(queueResource);
         }
-        await _ingestApi.UpsertResource(queueList);
+        await _ingestApi.IngestResource(queueList);
     }
 }
 

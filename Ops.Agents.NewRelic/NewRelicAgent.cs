@@ -68,7 +68,7 @@ public class NewRelicAgent : IOpsAgent
             machines.Add(machine);
         }
 
-        await _ingestApi.UpsertResource(machines);
+        await _ingestApi.IngestResource(machines);
     }
 }
 

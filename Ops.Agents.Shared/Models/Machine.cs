@@ -18,7 +18,6 @@ public class Machine : Asset
     }
 
     public string MachineName { get; set; }
-    public string? Description { get; set; }
     public List<string> Group { get; set; }
     public string? OSName { get; set; }
     public string? Architecture { get; set; }

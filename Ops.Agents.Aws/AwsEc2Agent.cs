@@ -40,7 +40,8 @@ public class AwsEc2Agent : IOpsAgent
                     PowerState = instance.State.Name.Value,
                     GuestFamily = instance.Platform.Value,
                     NumCpu = instance.CpuOptions.CoreCount,
-                    Location = "AWS " + agentConfig.Region
+                    Location = "AWS " + agentConfig.Region,
+                    MachineType = instance.InstanceType
                 };
                 vm.IpAddress.Add(instance.PrivateIpAddress);
                 if (instance.PublicIpAddress != null)
@@ -49,6 +50,6 @@ public class AwsEc2Agent : IOpsAgent
             }
         }
 
-        await _ingestApi.UpsertResource(virtualMachines);
+        await _ingestApi.IngestResource(virtualMachines);
     }
 }

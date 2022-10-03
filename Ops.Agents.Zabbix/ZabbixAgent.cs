@@ -45,7 +45,7 @@ public class ZabbixAgent : IOpsAgent
                                Architecture = GetArchitecture(h),
                                Tags = GetTags(h)
                            };
-            await _ingestApi.UpsertResource(machines);
+            await _ingestApi.IngestResource(machines);
         }
     }
 

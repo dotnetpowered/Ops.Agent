@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Ops.Agents.Shared.Models;
 
-public abstract class Asset
+public class Asset
 {
     public Asset(string Id, string Source, string AssetType)
     {
@@ -25,6 +25,7 @@ public abstract class Asset
     public string? Location { get; set; } // Physical Location (City, State)
     public string? Permalink { get; set; }
     public string? AgentVersion { get; set; }
+    public string? Description { get; set; }
 
     public override string ToString()
     {

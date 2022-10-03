@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
+using Ops.Agents.Shared;
 using Ops.Agents.Shared.Models;
 
 namespace Ops.Agents.vSphere;
@@ -31,12 +32,7 @@ public class vSphereAgent : IOpsAgent
         //ps.AddParameter("process", ScriptBlock.Create("$_ * 2"));
 
         // Load query from embedded resource
-        var assembly = Assembly.GetExecutingAssembly();
-        var stream = assembly.GetManifestResourceStream("Ops.Agents.vSphere.vmware_serverlist.ps1");
-        if (stream == null)
-            throw new InvalidOperationException("Unable to load vmware_serverlist.ps1 resource.");
-        var streamreader = new StreamReader(stream);
-        var query = streamreader.ReadToEnd();
+        string query = ResourceUtils.LoadEmbeddedResource<vSphereAgent>("vmware_serverlist.ps1");
         query = query.Replace("{{USER_NAME}}", agentConfig.Username);
         query = query.Replace("{{PASSWORD}}", agentConfig.Password);
         query = query.Replace("{{SERVER}}", agentConfig.Server);
@@ -84,7 +80,7 @@ public class vSphereAgent : IOpsAgent
                            GuestState = GetIntAsString(element, "GuestState"),
                            CreateDate = GetStringAsDateTime(element, "CreateDate")
                        };
-        await _ingestApi.UpsertResource(machines);
+        await _ingestApi.IngestResource(machines);
     }
 
     string GetHostName(JsonElement element)
