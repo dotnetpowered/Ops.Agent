@@ -89,9 +89,9 @@ public class SqlServerAgent : IOpsAgent
     private DataServer ToDataServer(TypedSqlReader reader, SqlNode node)
     {
         string machineName = node.NodeName.ToLower();
-        string instanceName = node.InstanceName.ToLower();
+        string? instanceName = node.InstanceName == null ? null : node.InstanceName.ToLower();
         bool isClustered = reader.GetValue<int>("IsClustered") == 1;
-        string clusterName = isClustered ? reader.GetString("ServerName").ToLower() : null;
+        string? clusterName = isClustered ? reader.GetString("ServerName").ToLower() : null;
 
         string id;
         if (isClustered)
