@@ -1,6 +1,4 @@
-﻿using Ops.Agents;
-
-namespace Ops.Agents.Service;
+﻿namespace Ops.Agents.Service;
 
 public class Worker : BackgroundService
 {
@@ -42,14 +40,23 @@ public class Worker : BackgroundService
                     case "Azure.UpdateService":
                         agent = _provider.GetService<Azure.AzureUpdateAgent>();
                         break;
+                    case "Elasticsearch":
+                        agent = _provider.GetService<Elasticsearch.ElasticsearchAgent>();
+                        break;
                     case "Google.Compute":
                         agent = _provider.GetService<Google.Cloud.GoogleComputeAgent>();
                         break;
                     case "Octopus.Deploy":
                         agent = _provider.GetService<Octopus.OctopusAgent>();
                         break;
+                    case "MongoDB":
+                        agent = _provider.GetService<MongoDB.MongoDbAgent>();
+                        break;
                     case "NewRelic":
                         agent = _provider.GetService<NewRelic.NewRelicAgent>();
+                        break;
+                    case "Ntirety":
+                        agent = _provider.GetService<Ntirety.NtiretyAgent>();
                         break;
                     case "PagerDuty.Rundeck":
                         agent = _provider.GetService<Rundeck.RundeckAgent>();

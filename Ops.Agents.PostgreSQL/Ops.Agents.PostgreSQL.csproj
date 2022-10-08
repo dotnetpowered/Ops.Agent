@@ -7,12 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Octopus.Client" />
-    <None Remove="Microsoft.Extensions.Logging.Abstractions" />
+    <None Remove="Microsoft.Extensions.Logging" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Octopus.Client" Version="14.2.245" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ops.Agents.Shared\Ops.Agents.Shared.csproj" />

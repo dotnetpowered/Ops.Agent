@@ -1,0 +1,158 @@
+﻿{
+  "host": "ac-jxbcodm-shard-00-01.nepdf2c.mongodb.net:27017",
+  "version": "5.0.13",
+  "process": "mongod",
+  "pid": 209461,
+  "uptime": 71894.0,
+  "uptimeMillis": 71893434,
+  "uptimeEstimate": 71893,
+  "localTime": "2022-10-05T15:06:00.07Z",
+  "asserts": {
+    "regular": 0,
+    "warning": 0,
+    "msg": 0,
+    "user": 0,
+    "rollovers": 0
+  },
+  "connections": {
+    "current": 3,
+    "available": 497,
+    "totalCreated": "20"
+  },
+  "extra_info": {
+    "note": "fields vary by platform",
+    "page_faults": 0
+  },
+  "network": {
+    "bytesIn": 29523,
+    "bytesOut": 170754,
+    "numRequests": "113"
+  },
+  "opcounters": {
+    "insert": 0,
+    "query": 0,
+    "update": 0,
+    "delete": 0,
+    "getmore": 0,
+    "command": 113,
+    "deprecated": {
+      "query": 0,
+      "getmore": "0)"
+    }
+  },
+  "opcountersRepl": {
+    "insert": 0,
+    "query": 0,
+    "update": 0,
+    "delete": 0,
+    "getmore": 0,
+    "command": 0,
+    "deprecated": {
+      "query": 0,
+      "getmore": 0
+    }
+  },
+  "repl": {
+    "topologyVersion": {
+      "processId": "ObjectId(\"633c84822c8f374c425f796d\"",
+      "counter": "6)"
+    },
+    "hosts": [ "ac-jxbcodm-shard-00-00.nepdf2c.mongodb.net:27017", "ac-jxbcodm-shard-00-01.nepdf2c.mongodb.net:27017", "ac-jxbcodm-shard-00-02.nepdf2c.mongodb.net:27017" ],
+    "setName": "atlas-zitq35-shard-0",
+    "setVersion": 9,
+    "isWritablePrimary": true,
+    "secondary": false,
+    "primary": "ac-jxbcodm-shard-00-01.nepdf2c.mongodb.net:27017",
+    "tags": {
+      "region": "US_EAST_1",
+      "provider": "AWS",
+      "workloadType": "OPERATIONAL",
+      "nodeType": "ELECTABLE"
+    },
+    "me": "ac-jxbcodm-shard-00-01.nepdf2c.mongodb.net:27017",
+    "electionId": "7fffffff000000000000009c",
+    "lastWrite": {
+      "opTime": {
+        "ts": "1664982360"
+      },
+      "lastWriteDate": "2022-10-05T15:06:00Z",
+      "majorityOpTime": {
+        "ts": "1664982360"
+      },
+      "majorityWriteDate": "2022-10-05T15:06:00Z"
+    },
+    "primaryOnlyServices": {
+      "TenantMigrationRecipientService": {
+        "state": "running",
+        "numInstances": 0
+      },
+      "TenantMigrationDonorService": {
+        "state": "running",
+        "numInstances": 0
+      }
+    },
+    "rbid": 4
+  },
+  "storageEngine": {
+    "name": "wiredTiger",
+    "supportsCommittedReads": true,
+    "oldestRequiredTimestampForCrashRecovery": 1664982340,
+    "supportsPendingDrops": true,
+    "dropPendingIdents": 0,
+    "supportsSnapshotReadConcern": true,
+    "readOnly": false,
+    "persistent": true,
+    "backupCursorOpen": false,
+    "supportsResumableIndexBuilds": true
+  },
+  "mem": {
+    "bits": 64,
+    "resident": 0,
+    "virtual": 0,
+    "supported": true,
+    "mapped": 0,
+    "mappedWithJournal": 0
+  },
+  "metrics": {
+    "aggStageCounters": {
+      "search": 0,
+      "searchBeta": 0,
+      "searchMeta": "0)"
+    },
+    "operatorCounters": {
+      "match": {
+        "text": 0,
+        "regex": "0)"
+      }
+    },
+    "atlas": { "connectionPool": { "totalCreated": "805908)" } }
+  },
+  "ok": 1.0,
+  "$clusterTime": {
+    "clusterTime": "Timestamp(1664982360",
+    7,
+    "signature": {
+      "hash": "ED/41WMwdObiXmShzlJrfH8qZB4=",
+      "keyId": "7120308465343397890"
+    }
+  },
+  "operationTime": "1664982360",
+  "opLatencies": {
+    "reads": {
+      "latency": 0,
+      "ops": "0)"
+    },
+    "writes": {
+      "latency": 0,
+      "ops": "0)"
+    },
+    "commands": {
+      "latency": 760692656,
+      "ops": "108)"
+    }
+  },
+  "atlasVersion": {
+    "version": "20220914.0.0.1663348381",
+    "gitVersion": "14bc9397d8af3fc806b476e052a5cf881cc9ff27"
+  }
+}

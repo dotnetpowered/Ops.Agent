@@ -24,10 +24,9 @@
     <ProjectReference Include="..\Ops.Agents.NewRelic\Ops.Agents.NewRelic.csproj" />
     <ProjectReference Include="..\Ops.Agents.Aws\Ops.Agents.Aws.csproj" />
     <ProjectReference Include="..\Ops.Agents.Google.Cloud\Ops.Agents.Google.Cloud.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="Refit" />
-    <None Remove="Refit.HttpClientFactory" />
-    <None Remove="Microsoft.Extensions.Logging.Console" />
+    <ProjectReference Include="..\Ops.Agents.SqlServer\Ops.Agents.SqlServer.csproj" />
+    <ProjectReference Include="..\Ops.Agents.Elasticsearch\Ops.Agents.Elasticsearch.csproj" />
+    <ProjectReference Include="..\Ops.Agents.Ntirety\Ops.Agents.Ntirety.csproj" />
+    <ProjectReference Include="..\Ops.Agents.MongoDB\Ops.Agents.MongoDB.csproj" />
   </ItemGroup>
 </Project>

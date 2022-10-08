@@ -7,9 +7,7 @@ public class Machine : Asset
 {
     public Machine(string Id, string Source, string MachineName) : base(Id, Source, "Machine")
     {
-        this.MachineName = MachineName.ToLower();
-        if (!this.MachineName.Contains('.'))
-            this.MachineName = MachineName + ".us.xeohealth.com";
+        this.MachineName = MachineName.ToLower().Split('.')[0];
         this.ResourceType = "machine";
         this.Group = new List<string>();
         this.IpAddress = new List<string>();
