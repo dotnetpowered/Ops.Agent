@@ -28,49 +28,70 @@ public class RundeckAgent : IOpsAgent
         };
         var rundeckClient = new RundeckClient(options);
 
+        var resourceList = new List<object>();
+        var systemInfo = await rundeckClient.System.GetSystemInfoAsync();
+        var system = systemInfo.System;
+        
+        var service = new Service(system.Rundeck.ServerUUID, this.SourceName, system.Rundeck.Node, "Job Automation", "PagerDuty RunDeck")
+        {
+            Version = system.Rundeck.Version,
+            Architecture = system.OsInfo.Arch,
+            OSName = system.OsInfo.Name + " " + system.OsInfo.Version,
+            Status = system.Executions.Active ? "Online" : "Offline",
+            ServiceStartTime = system.Stats.Uptime.Since.Datetime.DateTime,
+            NumCpu = system.Stats.Cpu.Processors,
+            MemoryUsageMB = system.Stats.Memory.Total / 1024 / 1024
+        };
+        resourceList.Add(service);
+
         var projects = await rundeckClient.Projects.GetAllAsync();
-        await CollectMachinesAsync(rundeckClient, projects);
-        await CollectExecutionsAsync(rundeckClient, projects);
+        var machines = await CollectMachinesAsync(rundeckClient, projects);
+        //await CollectJobsAsync(rundeckClient, projects);
+        resourceList.AddRange(machines);
+
+        await _ingestApi.IngestResource(resourceList);
+
     }
 
-    private async Task CollectExecutionsAsync(RundeckClient rundeckClient, List<ProjectListingDto> projects)
+    private async Task CollectJobsAsync(RundeckClient rundeckClient, List<ProjectListingDto> projects)
     {
-        var jobExecutions = new List<JobExecution>();
+        var jobs = new List<Shared.Models.Job>();
         foreach (var project in projects)
         {
-            var jobs = await rundeckClient.Jobs.GetAllAsync(project.Name);
+            var rundeckJobs = await rundeckClient.Jobs.GetAllAsync(project.Name);
 
-            foreach (var job in jobs)
+            foreach (var j in rundeckJobs)
             {
-                _logger.LogInformation($"Collecting Executions for job: {project.Name} {job.Name}");
-                var executions = await rundeckClient.Jobs.GetExecutionsAsync(job.Id, 0, 1);
+                //var job = new Shared.Models.Job(job.Id, this.SourceName, )
+                _logger.LogInformation($"Collecting Executions for job: {project.Name} {j.Name}");
+                //var executions = await rundeckClient.Jobs.GetExecutionsAsync(job.Id, 0, 1);
 
-                foreach (var e in executions.Executions)
-                {
-                    jobExecutions.AddRange(ToJobExecution(e, e.SuccessfulNodes, "Success"));
-                    jobExecutions.AddRange(ToJobExecution(e, e.FailedNodes, "Failure"));
-                }
+                //foreach (var e in executions.Executions)
+                //{
+                //    jobExecutions.AddRange(ToJobExecution(e, e.SuccessfulNodes, "Success"));
+                //    jobExecutions.AddRange(ToJobExecution(e, e.FailedNodes, "Failure"));
+                //}
             }
         }
-        await _ingestApi.IngestResource(jobExecutions);
+      //  await _ingestApi.IngestResource(jobExecutions);
     }
 
-    private IEnumerable<JobExecution> ToJobExecution(Execution e, IList<string> nodes, string executionStatus)
-    {
-        if (nodes == null)
-            return Array.Empty<JobExecution>();
+    //private IEnumerable<JobExecution> ToJobExecution(Execution e, IList<string> nodes, string executionStatus)
+    //{
+    //    if (nodes == null)
+    //        return Array.Empty<JobExecution>();
 
-        return from node in nodes
-               select new JobExecution(e.Job.Id.ToString() + "-" + node, this.SourceName, node, e.Job.Name)
-               {
-                   ExecutionId = e.Id.ToString(),
-                   Status = executionStatus,
-                   StartTime = e.DateStarted.Date,
-                   StopTime = e.DateEnded.Date
-               };
-    }
+    //    return from node in nodes
+    //           select new JobExecution(e.Job.Id.ToString() + "-" + node, this.SourceName, node, e.Job.Name)
+    //           {
+    //               ExecutionId = e.Id.ToString(),
+    //               Status = executionStatus,
+    //               StartTime = e.DateStarted.Date,
+    //               StopTime = e.DateEnded.Date
+    //           };
+    //}
 
-    private async Task CollectMachinesAsync(RundeckClient rundeckClient, List<ProjectListingDto> projects)
+    private async Task<List<Machine>> CollectMachinesAsync(RundeckClient rundeckClient, List<ProjectListingDto> projects)
     {
         var machines = new List<Machine>();
         foreach (var project in projects)
@@ -91,8 +112,7 @@ public class RundeckAgent : IOpsAgent
                               where !machines.Exists(m => m.Id == pm.Id)
                               select pm);
         }
-
-        await _ingestApi.IngestResource(machines);
+        return machines;
     }
 }
 

@@ -36,7 +36,7 @@ public class OctopusAgent : IOpsAgent
         List<DeploymentResource> deploymentResources
         )
     {
-        var deployments = new List<Deployment>();
+        var deployments = new List<DeployedService>();
         foreach (var item in dashboard.Items)
         {
             var deploymentResource = deploymentResources.Find(d => d.Id == item.DeploymentId);
@@ -46,16 +46,13 @@ public class OctopusAgent : IOpsAgent
                 var project = dashboard.Projects.Find(p => p.Id == item.ProjectId);
                 var environment = dashboard.Environments.Find(e => e.Id == item.EnvironmentId);
                 var machineName = new Uri(machine.Uri).Host;
-                var deployment = new Deployment(item.ProjectId+'-'+machineName, this.SourceName, machineName, project.Name)
+                var deployment = new DeployedService(item.ProjectId+'-'+machineName, this.SourceName, machineName, project.Name)
                 {
                     DeploymentId = item.DeploymentId,
-                    ProjectId = item.ProjectId,
-                    ReleaseId = item.ReleaseId,
-                    ReleaseVersion = item.ReleaseVersion,
+                    Version = item.ReleaseVersion,
                     StartTime = item.StartTime,
                     StopTime = item.CompletedTime,
                     Status = item.State.ToString(),
-                    EnvironmentId = item.EnvironmentId,
                     Environment = environment.Name,
                     DeployedBy = deploymentResource.DeployedBy,
                 };

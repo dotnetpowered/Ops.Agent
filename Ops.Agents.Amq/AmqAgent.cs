@@ -35,7 +35,17 @@ public class AmqAgent : IOpsAgent
 
         var list = brokerJson.GetProperty("Queues").EnumerateArray();
         var BrokerVersion = brokerJson.GetProperty("BrokerVersion").GetString();
-        var Uptime = brokerJson.GetProperty("Uptime").GetString();
+        var UptimeSec = (int) (brokerJson.GetProperty("UptimeMillis").GetUInt64() / 1000);
+        var id = $"amq-{agentConfig.Server}-{agentConfig.Port}";
+        var dataService = new DataService(id, this.SourceName, agentConfig.Server, "Queue Broker", "ActiveMQ")
+        {
+            OnlineRespositories = list.Count(),
+            Status = "Online",
+            Version = BrokerVersion,
+            ServiceStartTime = DateTime.Now - new TimeSpan(0, 0, 0, UptimeSec)
+        };
+        await _ingestApi.IngestResource(new[] { dataService });
+
         var queueList = new List<QueueResource>();
         foreach (var queue in list)
         {

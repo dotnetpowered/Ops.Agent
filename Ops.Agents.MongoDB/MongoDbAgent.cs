@@ -32,11 +32,11 @@ public class MongoDbAgent : IOpsAgent
             var db = client.GetDatabase("test");
             var command = new BsonDocument { { "serverStatus", 1 } };
             var result = db.RunCommand<BsonDocument>(command);
-            var host = result["host"].ToString();
+            var id = result["host"].ToString();
+            var host = id.Split(':')[0];
             var version = result["version"].ToString();
-            var server = new DataServer(host, this.SourceName, host)
+            var server = new DataService(id, this.SourceName, host, "DocumentDB", "Elasticsearch")
             {
-
             };
             Console.WriteLine(result);
         }

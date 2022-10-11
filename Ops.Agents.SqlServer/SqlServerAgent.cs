@@ -20,7 +20,7 @@ public class SqlServerAgent : IOpsAgent
 
     public async Task CollectAsync(AgentConfig agentConfig)
     {
-        List<DataServer> servers = new();
+        List<DataService> servers = new();
         List<SqlNode> nodes = new();
 
         // Open connection to SQL Server
@@ -86,7 +86,7 @@ public class SqlServerAgent : IOpsAgent
 
     }
 
-    private DataServer ToDataServer(TypedSqlReader reader, SqlNode node)
+    private DataService ToDataServer(TypedSqlReader reader, SqlNode node)
     {
         string machineName = node.NodeName.ToLower();
         string? instanceName = node.InstanceName == null ? null : node.InstanceName.ToLower();
@@ -101,14 +101,14 @@ public class SqlServerAgent : IOpsAgent
         else
             id = $"sql-{machineName}-{instanceName}";
 
-        DataServer server = new (id, this.SourceName, machineName)
+        DataService server = new (id, this.SourceName, machineName, "RDBMS", "Microsoft SQL Server")
         {
             ClusterName = clusterName,
             ActiveNode = node.CurrentNode,
             Status = node.Status,
             InstanceName = instanceName,
             Language = reader.GetString("Language"),
-            ServerStartTime = reader.GetValue<DateTime>("StartTime"),
+            ServiceStartTime = reader.GetValue<DateTime>("StartTime"),
             NumCpu = reader.GetValue<int>("CpuCount"),
             MemoryGB = (int)(reader.GetValue<long>("PhysicalMemoryMB") / 1024),
             MemoryUsageMB = reader.GetValue<long>("UsedMemoryMB"),
